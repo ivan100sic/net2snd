@@ -8,7 +8,7 @@
 using namespace std;
 
 const int CLOCK_SIG_FREQ = 64;
-const unsigned int BIT_WIDTH = 400;
+const unsigned int BIT_WIDTH = 1000;
 
 vector<uint32_t> prepare_clock() {
 	vector<uint32_t> buffer(8 * BIT_WIDTH);

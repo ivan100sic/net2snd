@@ -14,7 +14,7 @@ int test_recording() {
 	// zeta = 1 / (bit_width * om0)
 	// zeta = freq / (TAU * bit_width)
 
-	const int BIT_WIDTH = 400;
+	const int BIT_WIDTH = 1000;
 
 	double DAMP = 0.01;
 	double TUNE = sqrt(1 - 2 * DAMP * DAMP);
