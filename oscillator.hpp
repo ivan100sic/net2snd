@@ -13,7 +13,7 @@ struct Oscillator {
 	Oscillator() : om0(0) {}
 
 	void step(double f, double dt = 1) {
-		int res = 16;
+		int res = 64;
 		dt /= res;
 
 		while (res--) {
