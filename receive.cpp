@@ -44,6 +44,8 @@ int test_recording() {
 			clocc.step(clocc_sig.get_energy() / 100.0);
 			double new_x = clocc.x;
 
+			cerr << "e8 " << bits[8].get_energy() << '\n';
+
 			if (new_x > 0 && old_x <= 0) {
 
 				// cerr << bits[8].get_energy() << ' ' << clocc.get_energy() << '\n';
@@ -57,8 +59,6 @@ int test_recording() {
 							x += 1 << i;
 						}
 					}
-					cerr << "e8 " << bits[8].get_energy() << '\n';
-					cerr << '\n';
 					
 					/*if (x == '&') cout << "&amp;";
 					else if (x >= 32 && x <= 127) cout << x;
@@ -66,9 +66,6 @@ int test_recording() {
 					*/
 					cout << x;
 					cout.flush();
-				} else {
-					cerr << "e8 " << bits[8].get_energy() << '\n';
-					cerr << '\n';
 				}
 
 				for (int i=0; i<9; i++) bits[i].x = bits[i].v = 0;
