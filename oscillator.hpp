@@ -25,24 +25,6 @@ struct Oscillator {
 	Oscillator() : om0(0) {}
 
 	void step(double f, double dt = 1) {
-		// x'' + 2zw x' + ww x = f
-
-		// A = -sqrt(bbww-ww)-bw
-		// B = +sqrt(bbww-ww)-bw
-		// x(t) = c1 e^(At) + c2 e^(Bt) + f/w^2
-
-		/*
-		double a = f - om0*om0*x - 2*zeta*om0*v;
-		double vn = v + a * dt;
-		double dx = dt * (v + vn) / 2;
-
-		x += dx;
-		v = vn;
-		t += dt;
-		*/
-		// x = c1 + c2 + f/w^2
-		// v = c1 A e^At + c2 B e^Bt = c1 A + c2 B
-
 		double g = f/(om0*om0);			
 		cdouble c1 = (B*(g-x) + v) / (A - B);
 		cdouble c2 = x - c1 - g;

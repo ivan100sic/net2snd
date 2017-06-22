@@ -24,10 +24,10 @@ int test_recording() {
 	Oscillator clocc(TUNE * TAU / BIT_WIDTH, DAMP);
 	Oscillator bits[9];
 
-	double ENERGY = 20;
+	double ENERGY = 0.2;
 
 	vector<int> freqs = {38, 31, 24, 20, 16, 13, 10, 8, 6};
-	vector<double> ENERGIES = {25, 100, 100, 100, 100, 100, 100, 100, 100};
+	vector<double> ENERGIES = {0.25, 1, 1, 1, 1, 1, 1, 1, 1};
 	for (int i=0; i<9; i++) {
 		bits[i] = Oscillator(TAU / freqs[i], freqs[i] / TAU / BIT_WIDTH);
 		bits[i].autotune();
