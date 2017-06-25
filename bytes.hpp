@@ -15,4 +15,10 @@ int16_t u32_to_i16(uint32_t x) {
 	return y;
 }
 
+#include <cmath>
+
+void tau(double& x) {
+	x = fmod(x, TAU);
+}
+
 #endif // MYSOUNDLIB_BYTES

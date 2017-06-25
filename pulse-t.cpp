@@ -7,13 +7,10 @@
 #include <string>
 using namespace std;
 
-const int CLOCK_SIG_FREQ = 64;
-const unsigned int BIT_WIDTH = 400;
-
 vector<uint32_t> to_sound() {
 	
 	int pulses = 6;
-	int spacing = 2000;
+	int spacing = 100;
 
 	vector<uint32_t> buffer(2 * pulses * spacing, 0);
 	for (int i=0; i<pulses; i++) {

@@ -4,6 +4,7 @@
 // Creates an object which encapsulates a snd_pcm_t handle
 #include <alsa/asoundlib.h>
 #include <vector>
+#include <iostream>
 using namespace std;
 
 struct SoundPlaybackDevice {
@@ -12,7 +13,7 @@ struct SoundPlaybackDevice {
 	static SoundPlaybackDevice get_default() {
 		// Options
 		unsigned int sample_rate = 44100;
-		int DEFAULT_BUFFER_SIZE = 1024;
+		int DEFAULT_BUFFER_SIZE = 16384;
 		snd_pcm_hw_params_t* params;
 
 		SoundPlaybackDevice spd;
@@ -52,6 +53,7 @@ struct SoundPlaybackDevice {
 		if (handle) {
 			int err = snd_pcm_writei(handle, buff.data(), buff.size());
 			if (err < 0) {
+				cerr << "Recovering " << err << '\n';
 				snd_pcm_recover(handle, err, 1);
 			}
 		}

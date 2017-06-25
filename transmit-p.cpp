@@ -1,28 +1,31 @@
-#include "sound_playback_device.hpp"
-#include "sound_recording_device.hpp"
-#include "bytes.hpp"
+#include "common-p.hpp"
 #include <vector>
 #include <cmath>
 #include <numeric>
 #include <string>
 using namespace std;
 
-const int CLOCK_SIG_FREQ = 190;
-const unsigned int BIT_WIDTH = 1000;
+vector<double> bit_j(8, 0.0);
+double transmit_j = 0;
+double clock_j = 0;
 
 vector<uint32_t> prepare_clock() {
-	vector<uint32_t> buffer(8 * BIT_WIDTH);
+	size_t warmup_len = 32;
+	vector<uint32_t> buffer(warmup_len * BIT_WIDTH);
 
 	size_t buff_i = 0;
-	
-	for (int u=0; u<8; u++) {
+
+	for (size_t u=0; u<warmup_len; u++) {
 		for (size_t j=0; j<BIT_WIDTH; j++) {
-			double x = sin(TAU * j / CLOCK_SIG_FREQ);
 			double pos = j * 1.0 / BIT_WIDTH;
+			double x = 0;
 			if (0.42 < pos && pos < 0.92) {
-				x = 0;
+				x = sin(clock_j += TAU / CLOCK_SIG_FREQ_OFF);
+			} else {
+				x = sin(clock_j += TAU / CLOCK_SIG_FREQ_ON);
 			}
-			double scale = 3270;
+			x += sin(transmit_j += TAU / TRANSMIT_OFF);
+			double scale = 4000;
 			buffer[j + buff_i] = i16_to_u32(scale * x);
 		}
 		buff_i += BIT_WIDTH;
@@ -38,28 +41,36 @@ vector<uint32_t> bytes_to_sound(string s) {
 	
 	for (char x : s) {
 		uint8_t b = x;
-		vector<int> freqs = {CLOCK_SIG_FREQ, 38, 31, 24, 20, 16, 13, 10, 8, 6};
-		vector<double> pows;
-		for (int x : freqs) pows.push_back(x);
-		pows[1] *= 4;
+		
 		for (size_t j=0; j<BIT_WIDTH; j++) {
-			double x = pows[0] * sin(TAU * j / freqs[0]);
+			double x = 0;
 			double pos = j * 1.0 / BIT_WIDTH;
 			if (0.42 < pos && pos < 0.92) {
-				x = 0;
+				x = sin(clock_j += TAU / CLOCK_SIG_FREQ_OFF);
+			} else {
+				x = sin(clock_j += TAU / CLOCK_SIG_FREQ_ON);
 			}
 			for (int i=0; i<8; i++) {
+				int fid = 2*i;
 				if (b & (1 << i)) {
-					x += sin(TAU * j / freqs[1+i]) * pows[1+i];
+					x += sin(bit_j[i] += TAU / freqs[fid + 1]);
+				} else {
+					x += sin(bit_j[i] += TAU / freqs[fid]);
 				}
 			}
-			x += sin(TAU * j / freqs[9]) * pows[9];
-			double scale = 1 * 32766 / accumulate(pows.begin(), pows.end(), 0.0);
+			x += sin(transmit_j += TAU / TRANSMIT_ON);
+			double scale = 1200.0;
 			buffer[j + buff_i] = i16_to_u32(scale * x);
 		}
 		buff_i += BIT_WIDTH;
 	}
-	
+
+	for (double& x : bit_j) {
+		tau(x);
+	}
+	tau(transmit_j);
+	tau(clock_j);
+
 	return buffer;
 }
 
@@ -78,9 +89,8 @@ int transmit() {
 	// s.clear();
 	// for (int i=0; i<8; i++) s.push_back(1 << i);
 
-	s = "\xff\xff\xff\xff";
+	// s = "\xff\xff\xff\xff";
 
-	auto buff = bytes_to_sound(s);
 	auto pc = prepare_clock();
 
 	auto spb = SoundPlaybackDevice::get_default();
@@ -91,8 +101,10 @@ int transmit() {
 	spb.write(pc);
 
 	while (1) {
-		spb.write(buff);
+		auto bts = bytes_to_sound(s);
+		spb.write(bts);
 	}
+	
 	spb.flush();
 	return 0;
 }
